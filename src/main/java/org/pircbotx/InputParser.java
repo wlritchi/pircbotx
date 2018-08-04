@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import static org.pircbotx.ReplyConstants.*;
 import org.pircbotx.cap.CapHandler;
 import org.pircbotx.cap.TLSCapHandler;
+import org.pircbotx.exception.DaoException;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.BanListEvent;
@@ -352,7 +353,7 @@ public class InputParser implements Closeable {
 		if (!bot.loggedIn)
 			processConnect(line, command, target, parsedLine);
 
-		//Might be a backend code 
+		//Might be a backend code
 		int code = Utils.tryParseInt(command, -1);
 		if (code != -1) {
 			processServerResponse(code, line, parsedLine);
@@ -550,13 +551,17 @@ public class InputParser implements Closeable {
 			configuration.getListenerManager().onEvent(new JoinEvent(bot, channel, source, sourceUser));
 		} else if (command.equals("PART")) {
 			// Someone is parting from a channel.
-			UserChannelDaoSnapshot daoSnapshot;
-			ChannelSnapshot channelSnapshot;
-			UserSnapshot sourceSnapshot;
+			UserChannelDaoSnapshot daoSnapshot = null;
+			ChannelSnapshot channelSnapshot = null;
+			UserSnapshot sourceSnapshot = null;
 			if (configuration.isSnapshotsEnabled()) {
 				daoSnapshot = bot.getUserChannelDao().createSnapshot();
 				channelSnapshot = daoSnapshot.getChannel(channel.getName());
-				sourceSnapshot = daoSnapshot.getUser(source);
+				try {
+				  sourceSnapshot = daoSnapshot.getUser(source);
+				} catch (DaoException e) {
+				  // Ignore missing user exceptions
+				}
 			} else {
 				daoSnapshot = null;
 				channelSnapshot = null;
@@ -566,7 +571,7 @@ public class InputParser implements Closeable {
 			if (source.getNick().equalsIgnoreCase(bot.getNick()))
 				//We parted the channel
 				bot.getUserChannelDao().removeChannel(channel);
-			else
+			else if (sourceUser != null)
 				//Just remove the user from memory
 				bot.getUserChannelDao().removeUserFromChannel(sourceUser, channel);
 			configuration.getListenerManager().onEvent(new PartEvent(bot, daoSnapshot, channelSnapshot, source, sourceSnapshot, message));
@@ -585,9 +590,9 @@ public class InputParser implements Closeable {
 		} else if (command.equals("QUIT")) {
 			UserChannelDaoSnapshot daoSnapshot;
 			UserSnapshot sourceSnapshot;
-			if (configuration.isSnapshotsEnabled()) {
+			if (configuration.isSnapshotsEnabled() && sourceUser != null) {
 				daoSnapshot = bot.getUserChannelDao().createSnapshot();
-				sourceSnapshot = daoSnapshot.getUser(sourceUser.getNick());
+				sourceSnapshot = sourceUser == null ? null : daoSnapshot.getUser(sourceUser.getNick());
 			} else {
 				daoSnapshot = null;
 				sourceSnapshot = null;
@@ -595,7 +600,7 @@ public class InputParser implements Closeable {
 			//A real target is missing, so index is off
 			String reason = target;
 			// Someone has quit from the IRC server.
-			if (!source.getNick().equals(bot.getNick()))
+			if (!source.getNick().equals(bot.getNick()) && sourceUser != null)
 				//Someone else
 				bot.getUserChannelDao().removeUser(sourceUser);
 			configuration.getListenerManager().onEvent(new QuitEvent(bot, daoSnapshot, source, sourceSnapshot, reason));
@@ -732,7 +737,7 @@ public class InputParser implements Closeable {
 		} else if (code == RPL_WHOREPLY) {
 			//EXAMPLE: 352 PircBotX #aChannel ~someName 74.56.56.56.my.Hostmask wolfe.freenode.net someNick H :0 Full Name
 			//Part of a WHO reply on information on individual users
-			
+
 			String channelName = parsedResponse.get(1);
 			Channel channel = bot.getUserChannelDao().channelExists(channelName) ? bot.getUserChannelDao().getChannel(channelName) : null;
 
@@ -885,7 +890,7 @@ public class InputParser implements Closeable {
 				bot.getUserChannelDao().getUser(nick).setIrcop(true);
 			}
 			whoisBuilder.get(nick).ircOp(true);
-		
+
 		} else if (code == RPL_ENDOFWHOIS) {
 			//End of whois
 			//318 TheLQ Plazma :End of /WHOIS list.

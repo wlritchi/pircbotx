@@ -183,15 +183,15 @@ public class InputParserTest {
 		assertEquals(aUser.getHostname(), "host.test", "User hostmask wrong on JoinEvent");
 
 		Channel aChannel = dao.getChannel("#aChannel");
-		
+
 		assertTrue(dao.containsUser(aUserHostmask.getNick()));
 		assertEquals(aUser.getChannels(), ImmutableSortedSet.of(aChannel), "User is not joined to channel after JoinEvent. Channels: " + aUser.getChannels());
 		assertEquals(aChannel.getUsers(), ImmutableSortedSet.of(aUser, test.bot.getUserBot()), "Channel is not joined to user after JoinEvent. Users: " + aChannel.getUsers());
 		assertEquals(aChannel.getUsersNicks(), ImmutableSortedSet.of(aUserHostmask.getNick(), test.bot.getUserBot().getNick()), "Channel nicks doesn't contain user");
-		
+
 		test.close();
 	}
-	
+
 	public void joinWhoDisabledTest() throws IOException, IrcException {
 		new PircTestRunner(TestUtils.generateConfigurationBuilder()
 				.setOnJoinWhoEnabled(false)
@@ -449,6 +449,23 @@ public class InputParserTest {
 		assertFalse(aChannel.containsMode('r'));
 		assertFalse(aChannel.containsMode('s'));
 	}
+
+	@Test
+  public void parse005SilenceWithoutNumbers() throws IOException, IrcException {
+    inputParser.handleLine(":sok.qc.ca.abjects.net 005 TvShow SAFELIST SILENCE " +
+        "KNOCK FNC WATCH=128 CHANLIMIT=#&:30 MAXLIST=be:60 NICKLEN=30 TOPICLEN=307 " +
+        "KICKLEN=307 CHANNELLEN=32 :are available on this server");
+
+    assertEquals(-1, bot.getServerInfo().getSilence());
+  }
+
+	@Test
+  public void parseQuitWithMissingUser() throws IOException, IrcException {
+    inputParser.handleLine(":Timmy!Timmy@scenep2p-C887D770.pool.mediaways.net " +
+        "QUIT :Quit: Going offline, see ya! (www.adiirc.com)");
+
+    assertEquals(0, bot.getServerInfo().getSilence());
+  }
 
 	@Test
 	public void userModeInitTest() throws Exception {
@@ -1037,9 +1054,9 @@ public class InputParserTest {
 		WhoisEvent event = bot.getTestEvent(WhoisEvent.class, "WhoisEvent not dispatched");
 		assertTrue(event.isSecureConnection(), "Event used insecure connection");
 	}
-	
-	
-	
+
+
+
 	@Test
 	public void whoisIrcOpTest() throws IOException, IrcException {
 		inputParser.handleLine(":irc.someserver.net 311 PircBotXUser OtherUser ~OtherLogin some.host1 * :" + aString);
@@ -1055,7 +1072,7 @@ public class InputParserTest {
 	public void whoisIrcOpRegisteredTest() throws IOException, IrcException {
 		User otherUser = TestUtils.generateTestUserOther(bot);
 		assertFalse(otherUser.isIrcop(), "User is IRCop at start");
-		
+
 		inputParser.handleLine(":irc.someserver.net 311 PircBotXUser OtherUser ~OtherLogin some.host1 * :" + aString);
 		inputParser.handleLine(":irc.someserver.net 313 PircBotXUser OtherUser :is a IRC operator");
 		inputParser.handleLine(":irc.someserver.net 318 PircBotXUser otheruser :End of /WHOIS list.");
@@ -1063,7 +1080,7 @@ public class InputParserTest {
 		//Make sure we get the correct event
 		WhoisEvent event = bot.getTestEvent(WhoisEvent.class, "WhoisEvent not dispatched");
 		assertTrue(event.isIrcOp(), "User is not IRC operator");
-		
+
 		//make sure the user object is registered as ircop
 		assertTrue(otherUser.isIrcop(), "User is not IRCop after WHOIS response");
 	}
@@ -1129,7 +1146,7 @@ public class InputParserTest {
 		test.assertEventClass(ServerResponseEvent.class);
 		test.close();
 	}
-	
+
 	@Test
 	public void nickAlreadyInUse2ParamAfterConnectTest() throws IOException, IrcException {
 		assertEquals(bot.getUserBot().getNick(), bot.getConfiguration().getName(), "bots user name doesn't match config username");
@@ -1152,7 +1169,7 @@ public class InputParserTest {
 		test.assertEventClass(ServerResponseEvent.class);
 		test.close();
 	}
-	
+
 	@Test
 	public void nickAlreadyInUse1ParamBeforeConnectTest() throws IOException, IrcException {
 		assertEquals(bot.getUserBot().getNick(), bot.getConfiguration().getName(), "bots user name doesn't match config username");
@@ -1176,7 +1193,7 @@ public class InputParserTest {
 		test.assertEventClass(ServerResponseEvent.class);
 		test.close();
 	}
-	
+
 	@Test
 	public void nickAlreadyInUse1ParamAfterConnectTest() throws IOException, IrcException {
 		assertEquals(bot.getUserBot().getNick(), bot.getConfiguration().getName(), "bots user name doesn't match config username");
@@ -1198,8 +1215,8 @@ public class InputParserTest {
 		test.assertEventClass(ServerResponseEvent.class);
 		test.close();
 	}
-	
-	
+
+
 
 	@Test
 	public void nickRenameQuitTest() throws IOException, IrcException {

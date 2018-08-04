@@ -68,7 +68,12 @@ public class MassEventTest {
 		
 		Constructor constructor = event.getDeclaredConstructors()[0];
 		//(subtract one parameter to account for bot)
-		assertEquals(constructor.getParameterTypes().length - 1, fieldCount, wrapClass(event, "Number of constructor parameters don't match number of fields"
+		int expected = constructor.getParameterTypes().length - 1;
+		if (event == IncomingFileTransferEvent.class) {
+		   // For the serverSocket
+		   expected++;
+		}
+		assertEquals(expected, fieldCount, wrapClass(event, "Number of constructor parameters don't match number of fields"
 				+ SystemUtils.LINE_SEPARATOR + "Constructor params [" + StringUtils.join(constructor.getParameterTypes(), ", ") + "]"));
 	}
 

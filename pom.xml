@@ -19,7 +19,7 @@
 		Project information
 	-->
 	<name>pircbotx</name>
-	<description>PircBotX is a powerful and flexible Java IRC library forked from the popular PircBot framework, 
+	<description>PircBotX is a powerful and flexible Java IRC library forked from the popular PircBot framework,
 		bringing many new up-to-date features and bug fixes in an official alternative distribution.</description>
 	<url>http://github.com/pircbotx/pircbotx</url>
 	<inceptionYear>2010</inceptionYear>
@@ -195,8 +195,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
 					<compilerArgs>

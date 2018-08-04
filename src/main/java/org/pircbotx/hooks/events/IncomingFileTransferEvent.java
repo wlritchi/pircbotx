@@ -20,6 +20,9 @@ package org.pircbotx.hooks.events;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -87,6 +90,9 @@ public class IncomingFileTransferEvent extends Event implements GenericDCCEvent 
 	@Getter(onMethod = @_({
 			@Override}))
 	protected final boolean passive;
+
+	private ServerSocket serverSocket;
+	private Socket userSocket;
 
 	public IncomingFileTransferEvent(PircBotX bot, @NonNull UserHostmask userHostmask, User user, @NonNull String rawFilename, @NonNull String safeFilename,
 			@NonNull InetAddress address, int port, long filesize, String token, boolean passive) {

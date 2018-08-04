@@ -94,12 +94,12 @@ public class MessageEvent extends Event implements GenericMessageEvent, GenericC
 	public void respond(String response) {
 		respondWith(getUser().getNick() + ": " + response);
 	}
-	
+
 	@Override
 	public void respondWith(String fullLine) {
 		getBot().sendIRC().message(channelSource, fullLine);
 	}
- 
+
 	/**
 	 * Respond with a message to the channel without the prefix
 	 *
@@ -120,7 +120,7 @@ public class MessageEvent extends Event implements GenericMessageEvent, GenericC
 	public void respondPrivateMessage(String response) {
 		getUser().send().message(response);
 	}
-	
+
 	/**
 	 * Alias of {@link #getTags() }
 	 */

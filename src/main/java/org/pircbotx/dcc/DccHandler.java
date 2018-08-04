@@ -46,6 +46,8 @@ import org.pircbotx.exception.DccException;
 import org.pircbotx.hooks.events.IncomingChatRequestEvent;
 import org.pircbotx.hooks.events.IncomingFileTransferEvent;
 import static com.google.common.base.Preconditions.*;
+
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 import java.net.Inet6Address;
@@ -177,7 +179,7 @@ public class DccHandler implements Closeable {
 					Map.Entry<PendingRecieveFileTransfer, CountDownLatch> curEntry = pendingItr.next();
 					IncomingFileTransferEvent transferEvent = curEntry.getKey().getEvent();
 					if (transferEvent.getUser() == user && transferEvent.getRawFilename().equals(filename)
-							&& transferEvent.getPort() == port && transferEvent.getToken().equals(transferToken)) {
+							&& transferEvent.getPort() == port && Objects.equal(transferEvent.getToken(), transferToken)) {
 						curEntry.getKey().setPosition(position);
 						log.debug("Receive file transfer of file {} to user {} set to position {}",
 								transferEvent.getRawFilename(), transferEvent.getUser().getNick(), position);
@@ -235,13 +237,13 @@ public class DccHandler implements Closeable {
 		if (event.isPassive()) {
 			ServerSocket serverSocket = createServerSocket(event.getUser());
 			InetAddress publicAddress = getRealDccPublicAddress(serverSocket);
-			bot.sendDCC().chatPassiveAccept(event.getUser().getNick(), 
+			bot.sendDCC().chatPassiveAccept(event.getUser().getNick(),
 					publicAddress, serverSocket.getLocalPort(), event.getToken());
-			
-			log.debug("Sent DCC recieve chat accept to user {} ({}ms timeout) to passive connect on public address {}, local address {}", 
-					event.getUser().getNick(), 
+
+			log.debug("Sent DCC recieve chat accept to user {} ({}ms timeout) to passive connect on public address {}, local address {}",
+					event.getUser().getNick(),
 					bot.getConfiguration().getDccAcceptTimeout(),
-					publicAddress, 
+					publicAddress,
 					serverSocket.getLocalSocketAddress());
 			Socket userSocket = serverSocket.accept();
 
@@ -250,12 +252,12 @@ public class DccHandler implements Closeable {
 			return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(), userSocket);
 		} else {
 			InetAddress localAddress = getRealDccLocalAddress(event.getAddress());
-			log.debug("Accepting DCC recieve chat from user {} at address {} port {} from local address {}", 
-					event.getUser().getNick(), 
+			log.debug("Accepting DCC recieve chat from user {} at address {} port {} from local address {}",
+					event.getUser().getNick(),
 					event.getAddress(),
 					event.getPort(),
 					localAddress);
-			return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(), 
+			return bot.getConfiguration().getBotFactory().createReceiveChat(bot, event.getUser(),
 					new Socket(event.getAddress(), event.getPort(), localAddress, 0));
 		}
 	}
@@ -326,6 +328,7 @@ public class DccHandler implements Closeable {
 
 		if (event.isPassive()) {
 			ServerSocket serverSocket = createServerSocket(event.getUser());
+			event.setServerSocket(serverSocket);
 			bot.sendDCC().filePassiveAccept(event.getUser().getNick(), event.getRawFilename(), getRealDccPublicAddress(serverSocket), serverSocket.getLocalPort(), event.getFilesize(), event.getToken());
 			Socket userSocket = serverSocket.accept();
 
@@ -334,6 +337,7 @@ public class DccHandler implements Closeable {
 			return bot.getConfiguration().getBotFactory().createReceiveFileTransfer(bot, userSocket, event.getUser(), destination, startPosition, event.getFilesize());
 		} else {
 			Socket userSocket = new Socket(event.getAddress(), event.getPort(), getRealDccLocalAddress(event.getAddress()), 0);
+			event.setUserSocket(userSocket);
 			return bot.getConfiguration().getBotFactory().createReceiveFileTransfer(bot, userSocket, event.getUser(), destination, startPosition, event.getFilesize());
 		}
 	}
@@ -375,8 +379,8 @@ public class DccHandler implements Closeable {
 			bot.sendDCC().chatPassiveRequest(receiver.getNick(), publicAddress, chatToken);
 
 			//Wait for the user to acknowledge
-			log.debug("Sent DCC send chat request to user {} ({}ms timeout) for passive connect info using public address {}", 
-					receiver.getNick(), 
+			log.debug("Sent DCC send chat request to user {} ({}ms timeout) for passive connect info using public address {}",
+					receiver.getNick(),
 					bot.getConfiguration().getDccAcceptTimeout(),
 					publicAddress);
 			if (!countdown.await(dccAcceptTimeout, TimeUnit.MILLISECONDS))
@@ -392,10 +396,10 @@ public class DccHandler implements Closeable {
 			bot.sendDCC().chatRequest(receiver.getNick(), publicAddress, serverSocket.getLocalPort());
 
 			//Wait for user to connect
-			log.debug("Sent DCC send chat request to user {} ({}ms timeout) to connect on public address {}:{}, local address {}", 
-					receiver.getNick(), 
+			log.debug("Sent DCC send chat request to user {} ({}ms timeout) to connect on public address {}:{}, local address {}",
+					receiver.getNick(),
 					bot.getConfiguration().getDccAcceptTimeout(),
-					publicAddress, 
+					publicAddress,
 					serverSocket.getLocalPort(),
 					serverSocket.getLocalSocketAddress());
 			Socket userSocket = serverSocket.accept();
@@ -454,10 +458,10 @@ public class DccHandler implements Closeable {
 			bot.sendDCC().filePassiveRequest(receiver.getNick(), safeFilename, publicAddress, file.length(), transferToken);
 
 			//Wait for user to acknowledge
-			log.debug("Sent DCC send file request to user {} ({}ms timeout) for passive connect info using public address {} for file {}", 
-					receiver.getNick(), 
+			log.debug("Sent DCC send file request to user {} ({}ms timeout) for passive connect info using public address {} for file {}",
+					receiver.getNick(),
 					bot.getConfiguration().getDccAcceptTimeout(),
-					publicAddress, 
+					publicAddress,
 					file.getAbsolutePath());
 			if (!countdown.await(bot.getConfiguration().getDccAcceptTimeout(), TimeUnit.MILLISECONDS))
 				throw new DccException(DccException.Reason.FILE_TRANSFER_TIMEOUT, receiver, "File: " + file.getAbsolutePath());
@@ -477,11 +481,11 @@ public class DccHandler implements Closeable {
 			bot.sendDCC().fileRequest(receiver.getNick(), safeFilename, publicAddress, serverSocket.getLocalPort(), file.length());
 
 			//Wait for the user to connect
-			log.debug("Sent DCC send file request to user {} ({}ms timeout) to connect on public address {}, local address {}, port {} for file {}", 
-					receiver.getNick(), 
+			log.debug("Sent DCC send file request to user {} ({}ms timeout) to connect on public address {}, local address {}, port {} for file {}",
+					receiver.getNick(),
 					bot.getConfiguration().getDccAcceptTimeout(),
-					publicAddress, 
-					serverSocket.getLocalSocketAddress(), 
+					publicAddress,
+					serverSocket.getLocalSocketAddress(),
 					serverSocket.getLocalPort(),
 					file.getAbsolutePath());
 			Socket userSocket = serverSocket.accept();
@@ -506,14 +510,14 @@ public class DccHandler implements Closeable {
 		address = (address != null && destAddress.getClass().equals(address.getClass())) ? address : null;
 		return address;
 	}
-	
+
 	public InetAddress getRealDccLocalAddress() {
 		InetAddress address = bot.getConfiguration().getDccLocalAddress();
 		address = (address != null) ? address : bot.getConfiguration().getLocalAddress();
 		address = (address != null) ? address : bot.getLocalAddress();
 		return address;
 	}
-	
+
 	/**
 	 * Try to get a real InetAddress in this order:
 	 * <ol>
@@ -525,7 +529,7 @@ public class DccHandler implements Closeable {
 		InetAddress address = bot.getConfiguration().getDccPublicAddress();
 		return (address != null) ? address : getRealDccLocalAddress();
 	}
-	
+
 	/**
 	 * Try to get a real InetAddress in this order:
 	 * <ol>

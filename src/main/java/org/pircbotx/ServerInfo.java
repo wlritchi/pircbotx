@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * website
  * </a> on what each one does
  * <p>
- * Note: On get methods that return int, -1 means the value exists but is 
+ * Note: On get methods that return int, -1 means the value exists but is
  * unparsable natively
  *
  * @author Leon Blakey
@@ -234,7 +234,7 @@ public class ServerInfo {
 		//005 QTest MAXBANS=60 MAXCHANNELS=100 MAXPARA=32 MAXTARGETS=20 MODES=20 NAMESX NETWORK=Mozilla NICKLEN=31 OPERLOG OVERRIDE PREFIX=(Yqaohv)!~&@%+ SECURELIST SILENCE=32 :are supported by this server
 		//005 QTest SSL=[::]:6697 STARTTLS STATUSMSG=!~&@%+ TOPICLEN=307 UHNAMES USERIP VBANLIST WALLCHOPS WALLVOICES WATCH=32 :are supported by this server
 	}
-	
+
 	private static int tryParseInt(String name, String value) {
 		try {
 			return Integer.parseInt(value);
@@ -254,11 +254,11 @@ public class ServerInfo {
 	public ImmutableMap<String, String> getIsupportRaw() {
 		return ImmutableMap.copyOf(isupportRaw);
 	}
-	
+
 	public String getISupportValue(String key) {
 		return isupportRaw.get(key);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends PircBotX> T getBot() {
 		return (T) bot;

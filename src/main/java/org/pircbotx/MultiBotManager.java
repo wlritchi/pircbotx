@@ -30,8 +30,11 @@ import static com.google.common.base.Preconditions.*;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -198,7 +201,8 @@ public class MultiBotManager {
 			state = State.STOPPING;
 		}
 
-		for (PircBotX bot : runningBots.keySet())
+		Set<PircBotX> runningBotsCopy = new HashSet<>(runningBots.keySet());
+		for (PircBotX bot : runningBotsCopy)
 			if (bot.isConnected())
 				bot.sendIRC().quitServer(quitMessage);
 
