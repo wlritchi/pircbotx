@@ -1,3 +1,22 @@
+<!--
+
+    Copyright (C) 2010-2014 Leon Blakey <lord.quackstar at gmail.com>
+
+    This file is part of PircBotX.
+
+    PircBotX is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    PircBotX is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+    A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with
+    PircBotX. If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!--Sonatype Parent POM-->
 	<parent>
@@ -13,7 +32,7 @@
 	<groupId>org.pircbotx</groupId>
 	<artifactId>pircbotx</artifactId>
 	<packaging>jar</packaging>
-	<version>2.2-SNAPSHOT</version>
+	<version>2.3-SNAPSHOT</version>
 	
 	<!--
 		Project information
@@ -79,8 +98,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<lombok.version>1.16.18</lombok.version>
-		<guava.version>19.0</guava.version>
+		<lombok.version>1.18.12</lombok.version>
+		<guava.version>28.2-jre</guava.version>
 		<src.dir>src/main/java</src.dir>
 		<snapshot.version />
 	</properties>
@@ -99,15 +118,20 @@
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
-			<version>3.0.1</version>
+			<version>3.0.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Commons Lang for useful utilities -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
-		</dependency>
+			<version>3.9</version>
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.8</version>
+		</dependency>		
 		<!-- Slf4j for logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -117,7 +141,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
+			<version>1.14</version>
 		</dependency>
 		<!-- Guava for collections -->
 		<dependency>
@@ -154,7 +178,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.13</version>
+				<version>1.7.30</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -164,9 +188,9 @@
 		<plugins>
 			<!--Makes sure License Headers are consistant across all files-->
 			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.10.b1</version>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
 				<configuration>
 					<header>src/etc/license-header.txt</header>
 					<excludes>
@@ -189,19 +213,19 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--Specifically target Java 1.5-->
+			<!--Specifically target Java 1.8-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>8</source>
+					<target>8</target>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
 					<compilerArgs>
 						<arg>-Xlint</arg>
-						<!-- Disable warning about compiling to 1.5 -->
+						<!-- Disable warning about compiling to 1.8 -->
 						<arg>-Xlint:-options</arg>
 					</compilerArgs>
 				</configuration>
@@ -332,6 +356,16 @@
 					<useDefaultManifestFile>true</useDefaultManifestFile>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.gaul</groupId>
+				<artifactId>modernizer-maven-plugin</artifactId>
+				<version>2.1.0</version>
+				<configuration>
+					<javaVersion>1.8</javaVersion>
+				</configuration>
+			</plugin>    
+			
 		</plugins>
 	</build>
 
@@ -386,9 +420,9 @@
 						<version>1.16.6.1</version>
 						<dependencies>
 							<dependency>
-								<groupId>sun.jdk</groupId>
-								<artifactId>tools</artifactId>
-								<version>1.6</version>
+								<groupId>jdk.tools</groupId>
+								<artifactId>jdk.tools</artifactId>
+								<version>1.8</version>
 								<scope>system</scope>
 								<systemPath>${toolsjar}</systemPath>
 							</dependency>
@@ -525,7 +559,7 @@
 									<artifactId>maven-pmd-plugin</artifactId>
 									<version>3.3</version>
 									<configuration>
-										<source>1.5</source>
+										<source>1.8</source>
 										<rulesets>
 											<ruleset>src/etc/pmd-rules.xml</ruleset>
 										</rulesets>

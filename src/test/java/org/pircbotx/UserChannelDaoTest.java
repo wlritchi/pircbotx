@@ -31,7 +31,7 @@ import static org.testng.Assert.*;
 @Test(singleThreaded = true)
 public class UserChannelDaoTest {
 	protected PircBotX smallBot;
-	protected UserChannelDao dao;
+	protected UserChannelDao<User,Channel> dao;
 
 	@BeforeMethod
 	public void setup() {
@@ -75,7 +75,7 @@ public class UserChannelDaoTest {
 	public void channelExistsTest() {
 		dao.createChannel("#aChannel");
 		//Make sure it exists
-		assertTrue(dao.channelExists("#aChannel"));
+		assertTrue(dao.containsChannel("#aChannel"));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 language: java
-jdk: openjdk7
+jdk: openjdk8
 
 
 install:
@@ -15,7 +15,8 @@ script:
   - mvn clean install -Dsnapshot.version=-`git rev-parse --short HEAD`
 
 after_success:
- - test $TRAVIS_BRANCH = "master" && mvn source:jar deploy --settings .travis/maven-settings.xml -Dmaven.test.skip=true
+ - test "$TRAVIS_BRANCH" = "master" &&  test "$TRAVIS_PULL_REQUEST" = "false" && mvn source:jar deploy --settings .travis/maven-settings.xml -Dmaven.test.skip=true
+ - test "$TRAVIS_TAG" != "" && mvn source:jar deploy --settings .travis/maven-settings-release.xml -Dmaven.test.skip=true
  - codecov
 # - bash -x -e .travis/deploy.sh
 

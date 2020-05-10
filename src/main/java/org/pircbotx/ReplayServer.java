@@ -17,8 +17,6 @@
  */
 package org.pircbotx;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,19 +25,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Queue;
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.pircbotx.delay.StaticReadonlyDelay;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.managers.GenericListenerManager;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.pircbotx.hooks.types.GenericMessageEvent;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helpful server for replaying a raw log to the bot.
@@ -146,7 +150,7 @@ public class ReplayServer {
 				.setLogin("QP")
 				.addServer("example.com")
 				.setNickservPassword(System.getProperty("nickserv"))
-				.setMessageDelay(0)
+				.setMessageDelay( new StaticReadonlyDelay(0) )
 				.setListenerManager(new GenericListenerManager())
 				.setShutdownHookEnabled(false);
 	}
@@ -157,12 +161,12 @@ public class ReplayServer {
 		timer.start();
 
 		//Wrap listener manager with ours that siphons off events
-		final Queue<Event> eventQueue = Lists.newLinkedList();
+		final Queue<Event> eventQueue = new LinkedList<>();
 		WrapperListenerManager newManager = new WrapperListenerManager(config.getListenerManager(), eventQueue);
 		config.setListenerManager(newManager);
 		config.addListener(new ReplayListener());
 
-		final LinkedList<String> outputQueue = Lists.newLinkedList();
+		final LinkedList<String> outputQueue = new LinkedList<>();
 		ReplayPircBotX bot = new ReplayPircBotX(config.buildConfiguration(), outputQueue);
 
 		BufferedReader fileInput = new BufferedReader(new InputStreamReader(input));

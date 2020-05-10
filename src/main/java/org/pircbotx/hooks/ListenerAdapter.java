@@ -61,6 +61,8 @@ public abstract class ListenerAdapter implements Listener {
 			onIncomingChatRequest((IncomingChatRequestEvent) event);
 		else if (event instanceof IncomingFileTransferEvent)
 			onIncomingFileTransfer((IncomingFileTransferEvent) event);
+		else if (event instanceof FileTransferCompleteEvent)
+			onFileTransferComplete((FileTransferCompleteEvent) event);
 		else if (event instanceof InviteEvent)
 			onInvite((InviteEvent) event);
 		else if (event instanceof JoinEvent)
@@ -80,7 +82,11 @@ public abstract class ListenerAdapter implements Listener {
 		else if (event instanceof NoticeEvent)
 			onNotice((NoticeEvent) event);
 		else if (event instanceof OpEvent)
-			onOp((OpEvent) event);
+			onOp((OpEvent) event);		
+		else if (event instanceof OperFailedEvent)
+			onOperFailed((OperFailedEvent) event);
+		else if (event instanceof OperSuccessEvent)
+			onOperSuccess((OperSuccessEvent) event);		
 		else if (event instanceof OutputEvent)
 			onOutput((OutputEvent) event);
 		else if (event instanceof OwnerEvent)
@@ -150,9 +156,11 @@ public abstract class ListenerAdapter implements Listener {
 		else if (event instanceof VersionEvent)
 			onVersion((VersionEvent) event);
 		else if (event instanceof VoiceEvent)
-			onVoice((VoiceEvent) event);
+			onVoice((VoiceEvent) event);		
 		else if (event instanceof WhoisEvent)
 			onWhois((WhoisEvent) event);
+		else if (event instanceof WhoEvent)
+			onWho((WhoEvent) event);	
 		
 		//Exception methods
 		if (event instanceof ExceptionEvent)
@@ -212,6 +220,9 @@ public abstract class ListenerAdapter implements Listener {
 	}
 
 	public void onIncomingFileTransfer(IncomingFileTransferEvent event) throws Exception {
+	}
+
+	public void onFileTransferComplete(FileTransferCompleteEvent event) throws Exception {
 	}
 
 	public void onInvite(InviteEvent event) throws Exception {
@@ -354,6 +365,9 @@ public abstract class ListenerAdapter implements Listener {
 
 	public void onWhois(WhoisEvent event) throws Exception {
 	}
+	
+	public void onWho(WhoEvent event) throws Exception {
+	}	
 
 	public void onGenericCTCP(GenericCTCPEvent event) throws Exception {
 	}
@@ -380,5 +394,11 @@ public abstract class ListenerAdapter implements Listener {
 	}
 
 	public void onGenericChannelUser(GenericChannelUserEvent event) throws Exception {
+	}
+	
+	public void onOperSuccess(OperSuccessEvent event) throws Exception {
+	}
+	
+	public void onOperFailed(OperFailedEvent event) throws Exception {
 	}
 }

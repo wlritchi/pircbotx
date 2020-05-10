@@ -1,13 +1,15 @@
 [![Build Status](https://travis-ci.org/pircbotx/pircbotx.svg?branch=master)](https://travis-ci.org/pircbotx/pircbotx)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/25ed005ec882435fb5f7ce6b05e097c0)](https://www.codacy.com/app/pircbotx/pircbotx?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pircbotx/pircbotx/&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/25ed005ec882435fb5f7ce6b05e097c0)](https://www.codacy.com/app/pircbotx/pircbotx?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pircbotx/pircbotx/&amp;utm_campaign=Badge_Grade) [![Join the chat at https://gitter.im/pircbotx-irc/Lobby](https://badges.gitter.im/pircbotx-irc/Lobby.svg)](https://gitter.im/pircbotx-irc/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+**November 2018** PircBotX 2.2 released
 
 **November 2017** Project moved from /TheLQ/pircbotx to a new github organisation /pircbotx/pircbotx
 
 **January 2016** PircBotX 2.1 is finally released!
 
-**June 2015** We've moved from Google Code! [Issues, wiki, javadocs, and git mirror are on GitHub](https://github.com/pircbotx/PircBotX). [Mercurial mirror is on BitBucket](http://bitbucket.org/TheLQ/pircbotx)
+**June 2015** We've moved from Google Code! [Issues, wiki, javadocs, and git mirror are on GitHub](https://github.com/pircbotx/PircBotX). 
 
-[Current Version: 2.1](https://github.com/pircbotx/pircbotx/wiki/Downloads) - See [Migration Guide to 2.x](https://github.com/pircbotx/pircbotx/wiki/MigrationGuide2) and [ChangeLog](https://github.com/pircbotx/pircbotx/wiki/ChangeLog#21---january-24-2016) for more information
+[Current Version: 2.2](https://github.com/pircbotx/pircbotx/wiki/Downloads) - See [Migration Guide to 2.x](https://github.com/pircbotx/pircbotx/wiki/MigrationGuide2) and [ChangeLog](https://github.com/pircbotx/pircbotx/wiki/ChangeLog#21---january-24-2016) for more information
 
 **PircBotX** is a powerful and flexible Java IRC library forked from the popular PircBot framework, bringing many new up-to-date features and bug fixes in an official alternative distribution.
 
